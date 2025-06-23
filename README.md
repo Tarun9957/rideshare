@@ -1,10 +1,6 @@
 # Ride-Sharing App
 
 <p align="center">
-  <img src="public/placeholder-logo.svg" alt="Ride-Sharing App Logo" width="200"/>
-</p>
-
-<p align="center">
   <strong>A fully functional ride-sharing app built with Next.js, Firebase, and Google Maps API.</strong>
 </p>
 
