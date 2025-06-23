@@ -30,49 +30,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-// Mock data for ride types
-const rideTypes = [
-  {
-    id: "economy",
-    name: "Economy",
-    icon: <Car className="h-6 w-6" />,
-    time: "3-5 min",
-    basePrice: 8.50,
-    pricePerKm: 1.2,
-    capacity: "4 seats",
-    description: "Affordable rides for everyday travel",
-    features: ["Standard vehicle", "Friendly drivers", "GPS tracking"]
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    icon: <Zap className="h-6 w-6" />,
-    time: "2-4 min",
-    basePrice: 15.00,
-    pricePerKm: 2.1,
-    capacity: "4 seats",
-    description: "High-end vehicles with premium service",
-    features: ["Luxury vehicle", "Professional drivers", "Premium amenities"]
-  },
-  {
-    id: "shared",
-    name: "Shared",
-    icon: <Users className="h-6 w-6" />,
-    time: "8-12 min",
-    basePrice: 4.50,
-    pricePerKm: 0.8,
-    capacity: "2-3 seats",
-    description: "Share your ride and split the cost",
-    features: ["Shared ride", "Eco-friendly", "Best value"]
-  }
-]
-
-const paymentMethods = [
-  { id: "card", name: "Credit Card", icon: "💳", details: "**** 1234" },
-  { id: "wallet", name: "Digital Wallet", icon: "💰", details: "$24.50 available" },
-  { id: "cash", name: "Cash", icon: "💵", details: "Pay driver directly" }
-]
-
 function BookingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -84,18 +41,85 @@ function BookingContent() {
   const [promoCode, setPromoCode] = useState("")
   const [isScheduled, setIsScheduled] = useState(false)
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [distance, setDistance] = useState(0)
+  const [estimatedTime, setEstimatedTime] = useState(0)
 
   // Get trip data from URL params
   const pickup = searchParams.get('pickup') || "Current Location"
   const destination = searchParams.get('destination') || "Select Destination"
-  const distance = parseFloat(searchParams.get('distance') || '5.2')
-  const estimatedTime = parseInt(searchParams.get('time') || '12')
+  const pickupLat = parseFloat(searchParams.get('pickupLat') || '0')
+  const pickupLng = parseFloat(searchParams.get('pickupLng') || '0')
+  const destinationLat = parseFloat(searchParams.get('destinationLat') || '0')
+  const destinationLng = parseFloat(searchParams.get('destinationLng') || '0')
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login')
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    if (pickupLat && pickupLng && destinationLat && destinationLng) {
+      const service = new google.maps.DistanceMatrixService();
+      service.getDistanceMatrix(
+        {
+          origins: [{ lat: pickupLat, lng: pickupLng }],
+          destinations: [{ lat: destinationLat, lng: destinationLng }],
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (response, status) => {
+          if (status === "OK" && response) {
+            const distanceInMeters = response.rows[0].elements[0].distance.value;
+            const durationInSeconds = response.rows[0].elements[0].duration.value;
+            setDistance(distanceInMeters / 1000);
+            setEstimatedTime(durationInSeconds / 60);
+          }
+        }
+      );
+    }
+  }, [pickupLat, pickupLng, destinationLat, destinationLng])
+
+  const rideTypes = [
+    {
+      id: "economy",
+      name: "Economy",
+      icon: <Car className="h-6 w-6" />,
+      time: `${Math.round(estimatedTime)} min`,
+      basePrice: 8.50,
+      pricePerKm: 1.2,
+      capacity: "4 seats",
+      description: "Affordable rides for everyday travel",
+      features: ["Standard vehicle", "Friendly drivers", "GPS tracking"]
+    },
+    {
+      id: "premium",
+      name: "Premium",
+      icon: <Zap className="h-6 w-6" />,
+      time: `${Math.round(estimatedTime * 0.8)} min`,
+      basePrice: 15.00,
+      pricePerKm: 2.1,
+      capacity: "4 seats",
+      description: "High-end vehicles with premium service",
+      features: ["Luxury vehicle", "Professional drivers", "Premium amenities"]
+    },
+    {
+      id: "shared",
+      name: "Shared",
+      icon: <Users className="h-6 w-6" />,
+      time: `${Math.round(estimatedTime * 1.2)} min`,
+      basePrice: 4.50,
+      pricePerKm: 0.8,
+      capacity: "2-3 seats",
+      description: "Share your ride and split the cost",
+      features: ["Shared ride", "Eco-friendly", "Best value"]
+    }
+  ]
+
+  const paymentMethods = [
+    { id: "card", name: "Credit Card", icon: "💳", details: "**** 1234" },
+    { id: "wallet", name: "Digital Wallet", icon: "💰", details: "$24.50 available" },
+    { id: "cash", name: "Cash", icon: "💵", details: "Pay driver directly" }
+  ]
 
   const selectedRide = rideTypes.find(ride => ride.id === selectedRideType)
   const basePrice = selectedRide?.basePrice || 0

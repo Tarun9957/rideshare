@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -26,6 +26,7 @@ import {
   Car
 } from "lucide-react"
 import Link from "next/link"
+import Map from "@/components/Map"
 
 interface Trip {
   id: string
@@ -96,20 +97,15 @@ function OngoingContent() {
       if (tripDoc.exists()) {
         const data = tripDoc.data()
         
-        // Simulate driver assignment if not already assigned
+        // Assign a random driver if not already assigned
         if (!data.driver) {
+          const driversCollection = collection(db, "drivers");
+          const driversSnapshot = await getDocs(driversCollection);
+          const drivers = driversSnapshot.docs.map(doc => doc.data());
+          const randomDriver = drivers[Math.floor(Math.random() * drivers.length)];
+
           await updateDoc(doc(db, 'trips', tripId), {
-            driver: {
-              name: "Michael Johnson",
-              photo: "/placeholder-user.jpg",
-              rating: 4.9,
-              phone: "+1 (555) 123-4567",
-              car: {
-                model: "Toyota Camry",
-                color: "Silver",
-                licensePlate: "ABC-123"
-              }
-            },
+            driver: randomDriver,
             status: 'driver_assigned',
             updatedAt: serverTimestamp()
           })
@@ -245,23 +241,7 @@ function OngoingContent() {
           </div>
         </Card>
 
-        {/* Map Placeholder */}
-        <Card className="card-glass border-0 p-8">
-          <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg h-64 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="h-8 w-8 text-white" />
-              </div>
-              <p className="font-semibold text-gray-900">Live Trip Tracking</p>
-              <p className="text-sm text-gray-600">Real-time location updates</p>
-              <div className="mt-4 flex items-center justify-center space-x-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-75"></div>
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-150"></div>
-              </div>
-            </div>
-          </div>
-        </Card>
+        <Map pickup={trip.from} destination={trip.to} />
 
         {/* Driver Info */}
         <Card className="card-glass border-0 p-6">

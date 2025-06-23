@@ -23,7 +23,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [watchId, setWatchId] = useState<number | null>(null)
 
   const requestLocation = async () => {
-    if (!navigator.geolocation) {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       setError("Geolocation is not supported by this browser")
       return
     }
@@ -56,7 +56,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   }
 
   const watchLocation = () => {
-    if (!navigator.geolocation) return
+    if (typeof window === 'undefined' || !navigator.geolocation) return
 
     const id = navigator.geolocation.watchPosition(
       async (position) => {
@@ -81,10 +81,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   }
 
   const stopWatching = () => {
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId)
-      setWatchId(null)
-    }
+    if (typeof window === 'undefined' || watchId === null) return
+    navigator.geolocation.clearWatch(watchId)
+    setWatchId(null)
   }
 
   const searchPlaces = async (query: string): Promise<Location[]> => {
@@ -119,7 +118,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    requestLocation()
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      requestLocation()
+    }
     return () => stopWatching()
   }, [])
 

@@ -5,6 +5,7 @@ import "./globals.css"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { RideProvider } from "@/contexts/RideContext"
 import { LocationProvider } from "@/contexts/LocationContext"
+import { GoogleMapsProvider } from "@/contexts/GoogleMapsContext"
 import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -26,15 +27,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <LocationProvider>
-            <RideProvider>
-              {children}
-              <Toaster />
-              <div id="recaptcha-container"></div>
-            </RideProvider>
-          </LocationProvider>
-        </AuthProvider>
+        <GoogleMapsProvider>
+          <AuthProvider>
+            <LocationProvider>
+              <RideProvider>
+                {children}
+                <Toaster />
+                <div id="recaptcha-container"></div>
+              </RideProvider>
+            </LocationProvider>
+          </AuthProvider>
+        </GoogleMapsProvider>
       </body>
     </html>
   )

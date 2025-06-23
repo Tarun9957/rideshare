@@ -83,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Create new user document
       const newUser: Omit<User, "id"> = {
+        uid: firebaseUser.uid,
         email: firebaseUser.email || email,
         phone: phone,
         name: name,
