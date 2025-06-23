@@ -1,5 +1,7 @@
 # Ride-Sharing App
 
+![alt text](./assests/profile.png)
+
 <p align="center">
   <strong>A fully functional ride-sharing app built with Next.js, Firebase, and Google Maps API.</strong>
 </p>
@@ -24,6 +26,11 @@
 *   **Driver Assignment**: A dynamic driver assignment system that randomly assigns an available driver to a new trip.
 *   **Ride History**: Users can view their past rides and trip details.
 *   **Responsive Design**: A mobile-first design that works on all screen sizes.
+
+## Examples 
+![alt text](./assests/sign_in.png)
+![alt text](./assests/location.png)
+![alt text](./assests/wallet.png)
 
 ## Technical Documentation
 
