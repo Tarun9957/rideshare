@@ -185,6 +185,93 @@ The application is built with a modern, component-based architecture. The fronte
 
     The app will be available at `http://localhost:3000`.
 
+## Deployment
+
+### Deploy to Vercel
+
+The easiest way to deploy your ride-sharing app is to use the [Vercel Platform](https://vercel.com/new) from the creators of Next.js.
+
+#### Quick Deploy
+
+1. **Push to GitHub**: First, push your code to a GitHub repository.
+
+2. **Connect to Vercel**: 
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up/in with your GitHub account
+   - Click "New Project"
+   - Import your ride-sharing-app repository
+
+3. **Configure Environment Variables**: In your Vercel project dashboard, go to Settings > Environment Variables and add:
+   ```
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+   NEXT_PUBLIC_FIREBASE_API_KEY
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+   NEXT_PUBLIC_FIREBASE_APP_ID
+   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+   NEXT_PUBLIC_FIREBASE_VAPID_KEY
+   ```
+
+4. **Deploy**: Click "Deploy" and Vercel will automatically build and deploy your app.
+
+#### Manual Deploy with Vercel CLI
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy from your project directory
+vercel
+
+# For production deployment
+vercel --prod
+```
+
+#### Firebase Configuration for Production
+
+Before deploying, make sure to:
+
+1. **Update Firebase Security Rules**: Configure your Firestore security rules for production
+2. **Add Domain to Firebase**: Add your Vercel domain to Firebase Auth authorized domains
+3. **Update CORS Settings**: Configure Firebase to allow requests from your Vercel domain
+
+#### Post-Deployment Checklist
+
+- [ ] Verify all environment variables are set correctly
+- [ ] Test user authentication flow
+- [ ] Test Google Maps integration
+- [ ] Verify Firestore read/write operations
+- [ ] Test the complete booking flow
+- [ ] Check mobile responsiveness
+
+### Alternative Deployments
+
+#### Deploy to Netlify
+```bash
+# Build the project
+npm run build
+
+# Deploy to Netlify (install netlify-cli first)
+npm install -g netlify-cli
+netlify deploy --prod --dir=.next
+```
+
+#### Deploy to Railway
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and deploy
+railway login
+railway link
+railway up
+```
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
